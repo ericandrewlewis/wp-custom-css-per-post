@@ -1,6 +1,7 @@
 
 (function( $ ) {
 	$(document).on( 'ready', function() {
+		var postID = _customCSSSettings.postID;
 		/*
 		 * Create a custom on-click handler to open the Customizer with a preview
 		 * of the current state of the post in the Edit Post page.
@@ -33,7 +34,7 @@
 			 * and update the local setting value accordingly.
 			 */
 			wp.customize.Loader.messenger.bind('change', function() {
-				var val = wp.customize.Loader.iframe.get(0).contentWindow.wp.customize.instance('post[67][meta][custom_css]').get()
+				var val = wp.customize.Loader.iframe.get(0).contentWindow.wp.customize.instance('post[' + postID + '][meta][custom_css]').get()
 				$('[name="custom_css"]').val(val);
 			});
 		});
