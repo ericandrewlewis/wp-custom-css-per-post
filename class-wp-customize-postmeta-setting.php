@@ -1,6 +1,6 @@
 <?php
 /**
- * Create a class for the postmeta setting, because existing filters
+ * A class for postmeta Customizer Setting, because existing filters
  * inside of WP_Customize_Setting are not substantial enough, namely `customize_value_*`.
  */
 class WP_Customize_Postmeta_Setting extends WP_Customize_Setting {

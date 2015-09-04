@@ -4,7 +4,7 @@
  * control, etc) within the preview frame, and avoid the controls being de-activated
  * in the parent frame.
  */
-(function( api ) {
+(function( $, api ) {
 	/**
 	 * api.previewer will not be available until the `ready` event is called on
 	 * the Customizer event bus.
@@ -38,4 +38,20 @@
 		};
 		api.previewer.previewUrl.set( api.previewer.previewUrl() );
 	});
-})( wp.customize );
+
+	/**
+	 * After the Customizer frame has loaded,
+	 * create a button that will just close the the user to the Edit Post screen.
+	 *
+	 * The normal "save" button is hidden via css. @see css/customize-controls.css
+	 */
+	$(document).on( 'ready', function() {
+		var $button = $('<button type="button" name="back-to-edit-screen" id="back-to-edit-screen" class="button button-primary">Back to Edit screen</button>');
+		$('#customize-header-actions').prepend( $button );
+		$button.on( 'click', function() {
+			window.parent.wp.customize.Loader.saved( true );
+			$( '.customize-controls-close' ).trigger( 'click' );
+		});
+	});
+
+})( jQuery, wp.customize );

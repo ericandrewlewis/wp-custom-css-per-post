@@ -32,8 +32,11 @@ add_action( 'customize_controls_enqueue_scripts', function( $manager ) {
 		return;
 	}
 	wp_enqueue_script( 'custom-css-customize-controls',
-		plugins_url( '/js/script.js', __FILE__ ),
+		plugins_url( '/js/customize-controls.js', __FILE__ ),
 		array( 'customize-controls' ) );
+
+	wp_enqueue_style( 'custom-css-customize-controls',
+		plugins_url( '/css/customize-controls.css', __FILE__ ) );
 });
 
 /**
@@ -139,10 +142,7 @@ add_action( 'admin_enqueue_scripts', function($hook_suffix) {
 	}
 } );
 
-/*
- * Add a button in the Submit meta box that, on click, opens the customizer.
- */
-add_action( 'post_submitbox_misc_actions', function() {
+function custom_css_output_button() {
 	$post = get_post();
 
 	$preview_url = add_query_arg( array( 'preview' => true ), get_permalink( $post->ID ) );
@@ -172,8 +172,68 @@ add_action( 'post_submitbox_misc_actions', function() {
 	);
 
 	?>
-	<div style="margin: 10px 0; text-align: center;">
-		<button class="load-customize-with-post-preview button" href="<?php echo esc_url( $customize_url ) ?>" type="button">Custom CSS</button>
-	</div>
+	<button style="margin: 5px 0 10px;" class="load-customize-with-post-preview button" href="<?php echo esc_url( $customize_url ) ?>" type="button">Edit with live preview</button>
 	<?php
+}
+
+add_action( 'add_meta_boxes', function() {
+	add_meta_box(
+		'post_custom_css',
+		__( 'Custom CSS', 'custom_css_per_post' ),
+		'custom_css_meta_box_callback',
+		'post'
+	);
 } );
+
+/**
+ * Prints the box content.
+ *
+ * @param WP_Post $post The object for the current post/page.
+ */
+function custom_css_meta_box_callback( $post ) {
+
+	// Add a nonce field so we can check for it later.
+	wp_nonce_field( 'custom_css', 'custom_css_nonce' );
+
+	/*
+	 * Use get_post_meta() to retrieve an existing value
+	 * from the database and use the value for the form.
+	 */
+	$value = get_post_meta( $post->ID, 'custom_css', true );
+
+	custom_css_output_button();
+	echo '<textarea name="custom_css" style="width: 100%; min-height: 100px;">' . esc_textarea( $value ) . '</textarea>';
+}
+
+/**
+ * When the post is saved, saves our custom data.
+ *
+ * @param int $post_id The ID of the post being saved.
+ */
+function save_custom_css_data( $post_id ) {
+	if ( ! isset( $_POST['custom_css_nonce'] ) ) {
+		return;
+	}
+
+	if ( ! wp_verify_nonce( $_POST['custom_css_nonce'], 'custom_css' ) ) {
+		return;
+	}
+
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		return;
+	}
+
+	/* OK, it's safe for us to save the data now. */
+
+	if ( ! isset( $_POST['custom_css'] ) ) {
+		return;
+	}
+
+	$value = sanitize_text_field( $_POST['custom_css'] );
+	update_post_meta( $post_id, 'custom_css', $value );
+}
+add_action( 'save_post', 'save_custom_css_data' );
