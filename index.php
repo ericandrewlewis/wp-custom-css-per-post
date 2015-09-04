@@ -32,7 +32,7 @@ add_action( 'customize_controls_enqueue_scripts', function( $manager ) {
 		return;
 	}
 	wp_enqueue_script( 'custom-css-customize-controls',
-		plugins_url( '/script.js', __FILE__ ),
+		plugins_url( '/js/script.js', __FILE__ ),
 		array( 'customize-controls' ) );
 });
 
