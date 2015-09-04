@@ -1,7 +1,7 @@
 
 (function( $ ) {
 	$(document).on( 'ready', function() {
-		var postID = _customCSSSettings.postID;
+		var postID = $('#post_ID').val();
 		/*
 		 * Create a custom on-click handler to open the Customizer with a preview
 		 * of the current state of the post in the Edit Post page.

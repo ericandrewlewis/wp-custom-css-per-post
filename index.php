@@ -133,14 +133,6 @@ add_action( 'customize_register', function( $manager ) {
 
 }, 12, 1 );
 
-add_action( 'admin_footer', function() {
-	$post = get_post();
-	$settings = array(
-		'postID' => $post->ID
-	);
-	?><script>var _customCSSSettings = <?php echo json_encode( $settings ) ?>;</script><?php
-});
-
 /*
  * Enqueue the `customizer-loader` script on the Post Edit screen.
  */
