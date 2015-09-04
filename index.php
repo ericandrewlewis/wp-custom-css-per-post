@@ -36,6 +36,19 @@ add_action( 'customize_controls_enqueue_scripts', function( $manager ) {
 		array( 'customize-controls' ) );
 });
 
+/**
+ * Load the script that will handle opening a preview of the post being edited in
+ * Edit Post screen in the Customizer iframe.
+ */
+add_action( 'admin_enqueue_scripts', function( $hook_suffix ) {
+	if ( ! in_array($hook_suffix, array( 'post.php', 'post-new.php' ) ) ) {
+		return;
+	}
+	wp_enqueue_script( 'edit-post-page-script',
+		plugins_url( '/js/edit-post.js', __FILE__ ),
+		array( 'customize-loader' ) );
+});
+
 /*
  * Register a section, setting and control for custom css with the Customizer API.
  */
@@ -131,17 +144,36 @@ add_action( 'admin_enqueue_scripts', function($hook_suffix) {
  */
 add_action( 'post_submitbox_misc_actions', function() {
 	$post = get_post();
+
+	$preview_url = add_query_arg( array( 'preview' => true ), get_permalink( $post->ID ) );
+
+	/*
+	 * Add some extra query args if the preview is for an autosave.
+	 * @see post_preview()
+	 */
+	$post_not_draft_or_autodraft = $post->post_status != 'draft' && $post->post_status != 'auto-draft';
+	if ( $post_not_draft_or_autodraft ) {
+		$preview_url = add_query_arg(
+			array(
+				'preview_id' => $post->ID,
+				'preview_nonce' => wp_create_nonce( 'post_preview_' . $post->ID ),
+			),
+			$preview_url
+		);
+	}
+
 	$customize_url = add_query_arg(
 		array(
-			'url' => urlencode( get_permalink( $post->ID ) ),
+			'url' => urlencode( $preview_url ),
 			'custom_css_post_id' => $post->ID,
 			'autofocus' => array( 'section' => 'custom_css' ),
 		),
 		wp_customize_url()
 	);
+
 	?>
 	<div style="margin: 10px 0; text-align: center;">
-		<button class="load-customize button" href="<?php echo esc_url( $customize_url ) ?>" type="button">Custom CSS</button>
+		<button class="load-customize-with-post-preview button" href="<?php echo esc_url( $customize_url ) ?>" type="button">Custom CSS</button>
 	</div>
 	<?php
 } );
