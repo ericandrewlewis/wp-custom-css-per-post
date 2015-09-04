@@ -7,3 +7,5 @@ Edit Post screen in hidden input box.
 
 Should detect whether the page is loaded via customize-loader
 and save data instead of closing the window.
+
+Test. Change the value in the meta box and then click the Edit in Customizer button.
