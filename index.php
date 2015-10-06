@@ -117,7 +117,7 @@ add_action( 'customize_register', function( $manager ) {
 	// and the preview frame.
 	$wp_customize->add_section( 'custom_css', array(
 		'title' => __( 'Custom CSS' ),
-		'description' => __( 'Add custom CSS here' ),
+		'description' => __( '' ),
 		// Implicitly create a panel for the section.
 		'panel' => '',
 		'priority' => 160,
