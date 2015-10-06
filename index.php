@@ -220,7 +220,7 @@ function custom_css_meta_box_callback( $post ) {
 }
 
 /**
- * When the post is saved, saves our custom data.
+ * When the post is saved, save the custom CSS data.
  *
  * @param int $post_id The ID of the post being saved.
  */
