@@ -5,11 +5,6 @@
  * Author: Eric Andrew Lewis
  */
 
-add_action( 'customize_register', function() {
-	global $wp_customize;
-	require_once( plugin_dir_path( __FILE__ ) . 'class-wp-customize-postmeta-setting.php' );
-} );
-
 /**
  * Output per-post custom CSS in <head> of the site.
  *
@@ -23,6 +18,14 @@ add_action( 'wp_head', function() {
 	$post = get_post();
 	?><style type="text/css"><?php echo get_post_meta( $post->ID, 'custom_css', true ) ?></style><?php
 });
+
+/**
+ * Include code when the Customizer initializes.
+ */
+add_action( 'customize_register', function() {
+	global $wp_customize;
+	require_once( plugin_dir_path( __FILE__ ) . 'class-wp-customize-postmeta-setting.php' );
+} );
 
 /**
  * Enqueue the script that will pass the post ID through to the preview frame.
@@ -62,14 +65,18 @@ add_action( 'customize_register', function( $manager ) {
 	$is_preview_frame = ! is_admin() && is_customize_preview();
 	$is_query_var_set = isset( $_REQUEST['custom_css_post_id'] );
 
-	// We can extract the post ID from the query argument we've manually set
-	// both in the Customizer frame and the preview frame.
+	/*
+	 * We can extract the post ID that custom CSS is being edited for
+	 * from the query argument set both in the Customizer frame and the preview frame.
+	 */
 	if ( $is_query_var_set ) {
 		$post_id = $_REQUEST['custom_css_post_id'];
 	}
 
-	// The $_POST['customized'] value should be looked at to figure out the post id
-	// when saving data via AJAX.
+	/*
+	 * The $_POST['customized'] value should be looked at to figure out the post id
+	 * when saving data via AJAX.
+	 */
 	if ( isset( $_POST['customized'] ) ) {
 		$post_values = json_decode( wp_unslash( $_POST['customized'] ), true );
 		foreach ( $post_values as $setting_id => $post_value ) {
@@ -86,7 +93,7 @@ add_action( 'customize_register', function( $manager ) {
 		return;
 	}
 
-	// Hide all default panels and sections in the Customizer and Preview frame.
+	// Remove all default panels and sections in the Customizer and Preview frame.
 	if ( $is_customizer_frame ) {
 		foreach ( $wp_customize->panels() as $key => $panel ) {
 			$wp_customize->remove_panel( $key );
@@ -142,13 +149,17 @@ add_action( 'admin_enqueue_scripts', function($hook_suffix) {
 	}
 } );
 
-function custom_css_output_button() {
+/**
+ * Output the button for editing the CSS in the Customizer.
+ */
+function edit_custom_css_in_customizer_button() {
 	$post = get_post();
 
 	$preview_url = add_query_arg( array( 'preview' => true ), get_permalink( $post->ID ) );
 
 	/*
 	 * Add some extra query args if the preview is for an autosave.
+	 *
 	 * @see post_preview()
 	 */
 	$post_not_draft_or_autodraft = $post->post_status != 'draft' && $post->post_status != 'auto-draft';
@@ -176,6 +187,9 @@ function custom_css_output_button() {
 	<?php
 }
 
+/**
+ * Add a meta box on the Edit Post screen for Custom CSS.
+ */
 add_action( 'add_meta_boxes', function() {
 	add_meta_box(
 		'post_custom_css',
@@ -201,7 +215,7 @@ function custom_css_meta_box_callback( $post ) {
 	 */
 	$value = get_post_meta( $post->ID, 'custom_css', true );
 
-	custom_css_output_button();
+	edit_custom_css_in_customizer_button();
 	echo '<textarea name="custom_css" style="width: 100%; min-height: 100px;">' . esc_textarea( $value ) . '</textarea>';
 }
 
