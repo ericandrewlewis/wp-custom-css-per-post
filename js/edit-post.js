@@ -1,10 +1,9 @@
-
 (function( $ ) {
 	$(document).on( 'ready', function() {
 		var postID = $('#post_ID').val();
 		/*
-		 * Create a custom on-click handler to open the Customizer with a preview
-		 * of the current state of the post in the Edit Post page.
+		 * Create a custom on-click handler to open the Customizer with a post preview
+		 * in its drafted state in the Edit Post page.
 		 *
 		 * This is similar to the handler wp.customize.Loader.initialize() creates,
 		 * but that just opens the Customizer.
@@ -30,8 +29,8 @@
 			wp.customize.Loader.open( wp.customize.Loader.link.attr('href') );
 
 			/**
-			 * Listen to the 'change' event from the Customizer frame,
-			 * and update the local setting value accordingly.
+			 * When the 'change' event fires in the Customizer frame,
+			 * update the setting value in the Edit Post form.
 			 */
 			wp.customize.Loader.messenger.bind('change', function() {
 				var val = wp.customize.Loader.iframe.get(0).contentWindow.wp.customize.instance('post[' + postID + '][meta][custom_css]').get()

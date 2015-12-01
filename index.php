@@ -43,8 +43,9 @@ add_action( 'customize_controls_enqueue_scripts', function( $manager ) {
 });
 
 /**
- * Load the script that will handle opening a preview of the post being edited in
- * Edit Post screen in the Customizer iframe.
+ * Load the script that will handle opening the Customizer.
+ *
+ * This adds autosaving on top of the functionality of customize-loader.
  */
 add_action( 'admin_enqueue_scripts', function( $hook_suffix ) {
 	if ( ! in_array($hook_suffix, array( 'post.php', 'post-new.php' ) ) ) {
@@ -56,7 +57,7 @@ add_action( 'admin_enqueue_scripts', function( $hook_suffix ) {
 });
 
 /*
- * Register a section, setting and control for custom css with the Customizer API.
+ * Register a section, setting and control for custom CSS with the Customizer API.
  */
 add_action( 'customize_register', function( $manager ) {
 	global $wp_customize;
@@ -140,17 +141,8 @@ add_action( 'customize_register', function( $manager ) {
 
 }, 12, 1 );
 
-/*
- * Enqueue the `customizer-loader` script on the Post Edit screen.
- */
-add_action( 'admin_enqueue_scripts', function($hook_suffix) {
-	if ( in_array( $hook_suffix, array( 'post.php', 'post-new.php' ) ) ) {
-		wp_enqueue_script( 'customize-loader' );
-	}
-} );
-
 /**
- * Output the button for editing the CSS in the Customizer.
+ * Output the button for editing the CSS via the Customizer.
  */
 function edit_custom_css_in_customizer_button() {
 	$post = get_post();
@@ -200,7 +192,7 @@ add_action( 'add_meta_boxes', function() {
 } );
 
 /**
- * Prints the box content.
+ * Output the Custom CSS metabox content.
  *
  * @param WP_Post $post The object for the current post/page.
  */
@@ -220,11 +212,16 @@ function custom_css_meta_box_callback( $post ) {
 }
 
 /**
- * When the post is saved, save the custom CSS data.
+ * When the post is saved, save the custom CSS data that was submitted from the
+ * textarea as part of the Edit Post form.
  *
  * @param int $post_id The ID of the post being saved.
  */
 function save_custom_css_data( $post_id ) {
+	/*
+	 * Do a bunch of sanity and statefulness checks to ensure we're in the context
+	 * where we want to save.
+	 */
 	if ( ! isset( $_POST['custom_css_nonce'] ) ) {
 		return;
 	}
@@ -240,8 +237,6 @@ function save_custom_css_data( $post_id ) {
 	if ( ! current_user_can( 'edit_post', $post_id ) ) {
 		return;
 	}
-
-	/* OK, it's safe for us to save the data now. */
 
 	if ( ! isset( $_POST['custom_css'] ) ) {
 		return;

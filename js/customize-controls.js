@@ -1,8 +1,10 @@
 /**
  * Keep the the post ID that's being customized appended to the query string
- * of any preview, so that we can create Customizer objects (the individual setting,
- * control, etc) within the preview frame. The preview frame needs knowledge of these
- * to avoid deactivating controls in the parent frame.
+ * of any preview, so that Customizer objects (the individual setting,
+ * control, etc.) are created in the preview frame.
+ *
+ * The preview frame needs to be aware of these so it doesn't deactivate controls
+ * in the Customizer's controls pane.
  */
 (function( $, api ) {
 	/**
@@ -17,8 +19,8 @@
 		var originalValidate = api.previewer.previewUrl.validate;
 
 		/**
-		 * Add another URL validation on top of the original which will append
-		 * the post id we're editing the custom CSS for to the preview URL.
+		 * Add custom validation logic to append the post ID being customized
+		 * to the preview URL.
 		 */
 		api.previewer.previewUrl.validate = function ( url ) {
 			url = originalValidate.call( this, url );
@@ -40,7 +42,7 @@
 	});
 
 	/**
-	 * After the Customizer frame has loaded, create a button that will closes the
+	 * After the Customizer frame has loaded, create a button that closes the
 	 * Customizer and returns to the Edit Post screen.
 	 *
 	 * The Customizer's default "Save" button is hidden via css. @see css/customize-controls.css
