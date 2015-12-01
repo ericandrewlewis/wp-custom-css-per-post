@@ -8,8 +8,7 @@
 /**
  * Output per-post custom CSS in <head> of the site.
  *
- * The Customizer preview page loads will load the drafted changes here via internal
- * filters.
+ * A Customizer preview loads the drafted changes here via internal filters.
  */
 add_action( 'wp_head', function() {
 	if ( ! is_singular() ) {
@@ -45,7 +44,7 @@ add_action( 'customize_controls_enqueue_scripts', function( $manager ) {
 /**
  * Load the script that will handle opening the Customizer.
  *
- * This adds autosaving on top of the functionality of customize-loader.
+ * This script wraps the customize-loader with autosaving.
  */
 add_action( 'admin_enqueue_scripts', function( $hook_suffix ) {
 	if ( ! in_array($hook_suffix, array( 'post.php', 'post-new.php' ) ) ) {
@@ -58,12 +57,11 @@ add_action( 'admin_enqueue_scripts', function( $hook_suffix ) {
 
 /*
  * Register a section, setting and control for custom CSS with the Customizer API.
+ *
+ * This should be done only when in the context of editing Custom CSS.
  */
 add_action( 'customize_register', function( $manager ) {
 	global $wp_customize;
-
-	$is_customizer_frame = is_admin() && 'customize.php' == basename( $_SERVER['PHP_SELF'] );
-	$is_preview_frame = ! is_admin() && is_customize_preview();
 	$is_query_var_set = isset( $_REQUEST['custom_css_post_id'] );
 
 	/*
@@ -75,8 +73,7 @@ add_action( 'customize_register', function( $manager ) {
 	}
 
 	/*
-	 * The $_POST['customized'] value should be looked at to figure out the post id
-	 * when saving data via AJAX.
+	 * The $_POST['customized'] value tells us the post ID when saving data via AJAX.
 	 */
 	if ( isset( $_POST['customized'] ) ) {
 		$post_values = json_decode( wp_unslash( $_POST['customized'] ), true );
@@ -94,8 +91,10 @@ add_action( 'customize_register', function( $manager ) {
 		return;
 	}
 
+	$is_customizer_frame = is_admin() && 'customize.php' == basename( $_SERVER['PHP_SELF'] );
+	$is_preview_frame = ! is_admin() && is_customize_preview();
 	// Remove all default panels and sections in the Customizer and Preview frame.
-	if ( $is_customizer_frame ) {
+	if ( $is_customizer_frame || $is_preview_frame ) {
 		foreach ( $wp_customize->panels() as $key => $panel ) {
 			$wp_customize->remove_panel( $key );
 		}

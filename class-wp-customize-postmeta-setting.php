@@ -56,7 +56,6 @@ class WP_Customize_Postmeta_Setting extends WP_Customize_Setting {
 	}
 
 	protected function update( $value ) {
-		error_log( 'trying to update value' );
 		update_post_meta( $this->post_id(), $this->meta_key(), $value );
 	}
 }
