@@ -23,7 +23,7 @@ add_action( 'wp_head', function() {
  */
 add_action( 'customize_register', function() {
 	global $wp_customize;
-	require_once( plugin_dir_path( __FILE__ ) . 'class-wp-customize-postmeta-setting.php' );
+	require_once( plugin_dir_path( __FILE__ ) . 'class-custom-css-per-post-postmeta-setting.php' );
 } );
 
 /**
@@ -104,7 +104,7 @@ add_action( 'customize_register', function( $manager ) {
 		}
 	}
 
-	$setting = new WP_Customize_Postmeta_Setting(
+	$setting = new Custom_CSS_Per_Post_Postmeta_Customize_Setting(
 		$wp_customize,
 		sprintf( 'post[%d][meta][custom_css]', $post_id ),
 		array(

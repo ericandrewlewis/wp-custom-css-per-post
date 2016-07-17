@@ -3,7 +3,7 @@
  * A class for postmeta Customizer Setting, because existing filters
  * inside of WP_Customize_Setting are not substantial enough, namely `customize_value_*`.
  */
-class WP_Customize_Postmeta_Setting extends WP_Customize_Setting {
+class Custom_CSS_Per_Post_Postmeta_Customize_Setting extends WP_Customize_Setting {
 	/**
 	 * Utility function to extract the post ID from the id data.
 	 */
